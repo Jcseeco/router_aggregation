@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 import json
 
-host = 'http://192.168.50.164:8000'
+host = 'http://10.10.2.100:8000'
 
 def measure()->dict:
     return {
