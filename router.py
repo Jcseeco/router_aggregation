@@ -1,8 +1,8 @@
 import scapy.all as scapy
 import re
-from shared import ClientData, AggData, TracedData
-from datetime import datetime
+from shared import ClientData, AggData, RegionData
 import requests
+import argparse
 
 class ContentStore:
     contents:dict
@@ -90,7 +90,6 @@ def process_packet(packet: scapy.packet.Packet):
             # print(preprocess_type)
     
     elif src_ip in clients and is_json_payload(raw_payload):
-        # TODO aggregate and store
         try:
             client_data = ClientData.model_validate_json(raw_payload)
         except Exception as e:
@@ -98,7 +97,7 @@ def process_packet(packet: scapy.packet.Packet):
             return
         
         agg_data = store_aggregated_data(src_ip,client_data)
-        submit_agg_data(src_ip, agg_data)
+        submit_region_data(src_ip, agg_data)
         
 def store_aggregated_data(src_ip: str, client_data: ClientData) -> AggData:
     volt_min,volt_max = client_data.volt_minmax()
@@ -114,24 +113,30 @@ def store_aggregated_data(src_ip: str, client_data: ClientData) -> AggData:
     
     return store.push_data(src_ip, agg_data)
     
-def submit_agg_data(src_ip: str, data: AggData):
-    traced_data = TracedData.model_validate({
-        **data.model_dump(),
-        "src_ip": src_ip,
-        "router_id": "router1",
-        "router_timestamp": datetime.utcnow().isoformat()
-    })
-    print(traced_data)
+def submit_region_data(src_ip: str, data: AggData):
+    region_data.update(src_ip, data)
+    print(region_data.model_dump_json())
     try:
-        response = requests.post('http://127.0.0.1:8001/aggreagted',
-                  json=traced_data.model_dump_json())
+        response = requests.post('http://127.0.0.1:8001/regionData',
+                  json=region_data.model_dump())
     except Exception as e:
         print(e)
+    
 
+# this block configurates args
+parser = argparse.ArgumentParser()
+parser.add_argument("-ri", "--router_id",dest='router_id')
+parser.add_argument("-i", "--iface",dest='iface',default='lo')
+parser.add_argument("-fh", "--filter_host",dest='filter_host',default='hooke')
+parser.add_argument("-fp", "--filter_port",dest='filter_port',default='8000')
+args = parser.parse_args()
+
+# initialize app contents
 clients = {}
 store = ContentStore()
+region_data = RegionData(router_id=args.router_id)
 
-interface = 'lo'
-filter = 'dst host 127.0.0.1 and dst port 8000'
+filter = f"dst host {args.filter_host} and dst port {args.filter_port}"
 
-sniffing(interface, filter)
+print(f"sniffing interface: {args.iface} for dst host: {args.filter_host} and dst port: {args.filter_port}")
+sniffing(args.iface, filter)
