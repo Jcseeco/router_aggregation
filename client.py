@@ -4,10 +4,10 @@ from datetime import datetime
 import time
 import argparse
 
-def measure()->dict:
+def measure(volt_count: int, temp_count: int)->dict:
     return {
-        "voltages": [random.randint(3400, 3450) for _ in range(10)],
-        "temperatures": [random.randint(250, 280) for _ in range(5)],
+        "voltages": [random.randint(3400, 3450) for _ in range(volt_count)],
+        "temperatures": [random.randint(250, 280) for _ in range(temp_count)],
         "timestamp": datetime.utcnow().isoformat()
     }
         
@@ -30,6 +30,12 @@ def define_args():
     parser.add_argument("-l",dest="limit",default=60,
                         type=int,
                         help="limit of requests sent")
+    parser.add_argument("-vc",dest="volt_count",default=160,
+                        type=int,
+                        help="number of voltage data points per measure")
+    parser.add_argument("-tc",dest="temp_count",default=40,
+                        type=int,
+                        help="number of temperature data points per measure")
     
     return parser
 
@@ -43,7 +49,7 @@ def main():
         if count > args.limit:
             break
         
-        submit(args.dst_url,measure())
+        submit(args.dst_url,measure(args.volt_count,args.temp_count))
         time.sleep(args.interval)
         
 
