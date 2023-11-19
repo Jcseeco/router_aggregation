@@ -69,6 +69,7 @@ class RegionData(BaseModel):
     temp_min: Optional[RegionDataField] = RegionDataField()
     temp_max: Optional[RegionDataField] = RegionDataField()
     modified: bool = False
+    # the timestamp of the data packet that triggered the last update
     latest_timestamp: Optional[str] = None
     router_id: str
     router_timestamp: Optional[str] = None
@@ -90,19 +91,19 @@ class RegionData(BaseModel):
         """
         self.modified = False
         
-        if (self.volt_min.value is None) or (data.volt_min <= self.volt_min.value):
+        if (self.volt_min.value is None) or (data.volt_min <= self.volt_min.value) or (self.volt_min.src_ip == src_ip):
             self.volt_min.update(data.volt_min, src_ip,data.timestamp)
             self.modified = True
             
-        if (self.volt_max.value is None) or (data.volt_max <= self.volt_max.value):
+        if (self.volt_max.value is None) or (data.volt_max <= self.volt_max.value) or (self.volt_max.src_ip == src_ip):
             self.volt_max.update(data.volt_max, src_ip,data.timestamp)
             self.modified = True
             
-        if (self.temp_min.value is None) or (data.temp_min <= self.temp_min.value):
+        if (self.temp_min.value is None) or (data.temp_min <= self.temp_min.value) or (self.temp_min.src_ip == src_ip):
             self.temp_min.update(data.temp_min, src_ip,data.timestamp)
             self.modified = True
             
-        if (self.temp_max.value is None) or (data.temp_max <= self.temp_max.value):
+        if (self.temp_max.value is None) or (data.temp_max <= self.temp_max.value) or (self.temp_max.src_ip == src_ip):
             self.temp_max.update(data.temp_max, src_ip,data.timestamp)
             self.modified = True
         
