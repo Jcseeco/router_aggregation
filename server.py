@@ -5,14 +5,21 @@ import os.path
 
 app = FastAPI()
 
+# removes old log file on every restart
+f_suffix = f"_{datetime.now().strftime('%m-%d')}.csv"
+if os.path.isfile("./client_data"+f_suffix):
+    os.remove("./client_data"+f_suffix)
+if os.path.isfile("./region_data"+f_suffix):
+    os.remove("./region_data"+f_suffix)
+
 @app.get("/")
 async def root():
     return {"message":"hello world"}
 
 @app.post("/")
 async def read_data(data: ClientData, request: Request):
-    latency = datetime.utcnow() - datetime.fromisoformat(data.timestamp)
-    print(f"latency: {latency}")
+    latency = (datetime.utcnow() - datetime.fromisoformat(data.timestamp)).microseconds
+    print(f"latency: {latency} microseconds")
     
     log_client_data(request.client.host, data, latency)
     
@@ -21,7 +28,7 @@ async def read_data(data: ClientData, request: Request):
 @app.post("/regionData")
 async def read_aggregated(data: RegionData):
     time_now = datetime.utcnow()
-    print(f"latency: {time_now - datetime.fromisoformat(data.latest_timestamp)}")
+    print(f"latency: {(time_now - datetime.fromisoformat(data.latest_timestamp)).microseconds} microseconds")
     
     log_region_data(data, time_now)
     
@@ -59,5 +66,5 @@ def log_region_data(data: RegionData, received_time: datetime):
     else:
         f = open(filepath,"a")
     
-    f.write(f"{received_time.strftime('%m %d %Y %H:%I:%S.%f')},{received_time - datetime.fromisoformat(data.latest_timestamp)},{data.to_csv_line()}")
+    f.write(f"{received_time.strftime('%m %d %Y %H:%I:%S.%f')},{(received_time - datetime.fromisoformat(data.latest_timestamp)).microseconds},{data.to_csv_line()}")
     f.close()
