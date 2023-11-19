@@ -6,7 +6,7 @@ import argparse
 
 def measure(volt_count: int, temp_count: int)->dict:
     return {
-        "voltages": [random.randint(3400, 3450) for _ in range(volt_count)],
+        "voltages": [random.randint(3390, 3650) for _ in range(volt_count)],
         "temperatures": [random.randint(250, 280) for _ in range(temp_count)],
         "timestamp": datetime.utcnow().isoformat()
     }
