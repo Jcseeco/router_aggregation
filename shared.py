@@ -68,6 +68,7 @@ class RegionData(BaseModel):
     volt_max: Optional[RegionDataField] = RegionDataField()
     temp_min: Optional[RegionDataField] = RegionDataField()
     temp_max: Optional[RegionDataField] = RegionDataField()
+    modified: bool = False
     latest_timestamp: Optional[str] = None
     router_id: str
     router_timestamp: Optional[str] = None
@@ -87,26 +88,26 @@ class RegionData(BaseModel):
             src_ip (str): client ip address
             data (AggData): the aggregated data
         """
-        update_latest_time = False
+        self.modified = False
         
         if (self.volt_min.value is None) or (data.volt_min <= self.volt_min.value):
             self.volt_min.update(data.volt_min, src_ip,data.timestamp)
-            update_latest_time = True
+            self.modified = True
             
         if (self.volt_max.value is None) or (data.volt_max <= self.volt_max.value):
             self.volt_max.update(data.volt_max, src_ip,data.timestamp)
-            update_latest_time = True
+            self.modified = True
             
         if (self.temp_min.value is None) or (data.temp_min <= self.temp_min.value):
             self.temp_min.update(data.temp_min, src_ip,data.timestamp)
-            update_latest_time = True
+            self.modified = True
             
         if (self.temp_max.value is None) or (data.temp_max <= self.temp_max.value):
             self.temp_max.update(data.temp_max, src_ip,data.timestamp)
-            update_latest_time = True
+            self.modified = True
         
         # update the latest timestamp with timestamp of incoming packet if updates happened
-        if update_latest_time:
+        if self.modified:
             self.latest_timestamp = data.timestamp
             
         self.router_timestamp = datetime.utcnow().isoformat()

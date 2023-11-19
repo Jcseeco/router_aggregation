@@ -116,11 +116,15 @@ def store_aggregated_data(src_ip: str, client_data: ClientData) -> AggData:
 def submit_region_data(src_ip: str, data: AggData):
     region_data.update(src_ip, data)
     print(region_data.model_dump_json())
-    try:
-        response = requests.post('http://127.0.0.1:8001/regionData',
-                  json=region_data.model_dump())
-    except Exception as e:
-        print(e)
+    
+    # if region data has been modified, submit data
+    if region_data.modified:
+        region_data.modified = False
+        try:
+            response = requests.post("http://newton:8001/regionData",
+                    json=region_data.model_dump())
+        except Exception as e:
+            print(e)
     
 
 # this block configurates args
