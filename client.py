@@ -25,7 +25,7 @@ def define_args():
     parser.add_argument("-dst",dest="dst_url",default="http://hooke:8000",
                         help="destination full url")
     parser.add_argument("-t",dest="interval",default=1,
-                        type=int,
+                        type=float,
                         help="interval in seconds")
     parser.add_argument("-l",dest="limit",default=60,
                         type=int,
