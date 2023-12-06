@@ -66,8 +66,7 @@ def minmax(numbers: list):
     return min(numbers), max(numbers)
 
 def sniffing(interface: str,filter):
-    scapy.sniff(iface=interface,filter=filter,store=False,prn=process_packet)
-    # scapy.sniff(filter='port 8000',store=False,prn=process_packet)
+    scapy.sniff(filter=filter,store=False,prn=process_packet)
     
 def process_packet(packet: scapy.packet.Packet):
     
@@ -130,7 +129,6 @@ def submit_region_data(src_ip: str, data: AggData):
 # this block configurates args
 parser = argparse.ArgumentParser()
 parser.add_argument("-ri", "--router_id",dest='router_id')
-parser.add_argument("-i", "--iface",dest='iface',default='lo')
 parser.add_argument("-fh", "--filter_host",dest='filter_host',default='hooke')
 parser.add_argument("-fp", "--filter_port",dest='filter_port',default='8000')
 args = parser.parse_args()
@@ -142,5 +140,5 @@ region_data = RegionData(router_id=args.router_id)
 
 filter = f"dst host {args.filter_host} and dst port {args.filter_port}"
 
-print(f"sniffing interface: {args.iface} for dst host: {args.filter_host} and dst port: {args.filter_port}")
+print(f"sniffing dst host: {args.filter_host} and dst port: {args.filter_port}")
 sniffing(args.iface, filter)
