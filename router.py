@@ -120,7 +120,7 @@ def submit_region_data(src_ip: str, data: AggData):
         region_data.modified = False
         print(f"client: {src_ip} triggered region data update, t={region_data.latest_timestamp}")
         try:
-            response = requests.post("http://server2:8001/regionData",
+            response = requests.post(args.dst_url,
                     json=region_data.model_dump())
         except Exception as e:
             print(e)
@@ -128,9 +128,11 @@ def submit_region_data(src_ip: str, data: AggData):
 
 # this block configurates args
 parser = argparse.ArgumentParser()
-parser.add_argument("-ri", "--router_id",dest='router_id')
-parser.add_argument("-fh", "--filter_host",dest='filter_host',default='server1')
-parser.add_argument("-fp", "--filter_port",dest='filter_port',default='8000')
+parser.add_argument("-dst", "--dst_url", dest="dst_url",default="http://server2:8001/regionData",
+                        help="full url of the destination of aggregated data")
+parser.add_argument("-ri", "--router_id", dest='router_id')
+parser.add_argument("-fh", "--filter_host", dest='filter_host',default='server1')
+parser.add_argument("-fp", "--filter_port", dest='filter_port',default='8000')
 args = parser.parse_args()
 
 # initialize app contents
