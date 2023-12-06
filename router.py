@@ -65,7 +65,7 @@ def is_json_payload(raw_payload:str) -> bool:
 def minmax(numbers: list):    
     return min(numbers), max(numbers)
 
-def sniffing(interface: str,filter):
+def sniffing(filter):
     scapy.sniff(filter=filter,store=False,prn=process_packet)
     
 def process_packet(packet: scapy.packet.Packet):
@@ -146,4 +146,4 @@ region_data = RegionData(router_id=args.router_id)
 filter = f"dst host {args.filter_host} and dst port {args.filter_port}"
 
 print(f"sniffing dst host: {args.filter_host} and dst port: {args.filter_port}")
-sniffing(args.iface, filter)
+sniffing(filter)
