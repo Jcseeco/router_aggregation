@@ -130,9 +130,12 @@ def submit_region_data(src_ip: str, data: AggData):
 parser = argparse.ArgumentParser()
 parser.add_argument("-dst", "--dst_url", dest="dst_url",default="http://server2:8001/regionData",
                         help="full url of the destination of aggregated data")
-parser.add_argument("-ri", "--router_id", dest='router_id')
-parser.add_argument("-fh", "--filter_host", dest='filter_host',default='server1')
-parser.add_argument("-fp", "--filter_port", dest='filter_port',default='8000')
+parser.add_argument("-ri", "--router_id", dest='router_id',
+                        help="a label for this router or region")
+parser.add_argument("-fh", "--filter_host", dest='filter_host',default='server1',
+                        help="host name of the packet destination to filter")
+parser.add_argument("-fp", "--filter_port", dest='filter_port',default='8000',
+                        help="port of the packet destination to filter")
 args = parser.parse_args()
 
 # initialize app contents
