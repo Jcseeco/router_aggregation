@@ -120,7 +120,7 @@ def submit_region_data(src_ip: str, data: AggData):
         region_data.modified = False
         print(f"client: {src_ip} triggered region data update, t={region_data.latest_timestamp}")
         try:
-            response = requests.post("http://newton:8001/regionData",
+            response = requests.post("http://server2:8001/regionData",
                     json=region_data.model_dump())
         except Exception as e:
             print(e)
